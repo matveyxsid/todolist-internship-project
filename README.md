@@ -7,7 +7,7 @@
 
 ## Локальный запуск приложения с использованием Docker для базы данных
 
-#№# Требования
+### Требования
 - Docker + Docker Compose
 - Python 3.10+
 - Node.js 18+
@@ -40,10 +40,10 @@ docker compose up -d postgres
 
 ### Backend (Python + FastAPI)
 
-```cd backend```
+Переходим в директорию backend 
 
 Создаем вируальное окружение
-python -m venv venv
+```python -m venv venv```
 
 Активируем
 ```source venv/bin/activate```
@@ -59,8 +59,7 @@ python -m venv venv
 
 
 ### Frontend (React + TypeScript)
-
-```cd frontend```
+Переходим в директорию frontend
 
 Устанавливает зависимости
 ```npm install```
