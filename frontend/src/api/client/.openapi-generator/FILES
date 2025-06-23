@@ -1,0 +1,12 @@
+.openapi-generator-ignore
+apis/DefaultApi.ts
+apis/index.ts
+index.ts
+models/BodyUpdateCompletedStatusTodosTodoIdPatch.ts
+models/HTTPValidationError.ts
+models/TodoCreate.ts
+models/TodoOut.ts
+models/ValidationError.ts
+models/ValidationErrorLocInner.ts
+models/index.ts
+runtime.ts
