@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 import models
 import schemas
 from database import SessionLocal, engine
+from fastapi.middleware.cors import CORSMiddleware
+
 
 
 # создаем таблицы, если их нет
@@ -12,6 +14,15 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="To-Do List API",
     version="0.0.2"
+)
+
+# CORS для фронта
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # на время разработки можно поставить "*"
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # зависимость — получение сессии БД
