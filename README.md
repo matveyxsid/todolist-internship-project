@@ -2,7 +2,7 @@
 
 ## Полный запуск через Docker Compose
 
-**В процессе**
+**В процессе, пока в композе только бекенд+бд**
 
 
 ## Локальный запуск приложения с использованием Docker для базы данных
@@ -22,13 +22,14 @@ cd todolist
 
 
 ### Конфигурация
-Создайте .env и укажите переменные окружения
+Создаем .env и указываем переменные окружения
 
 ```
-DATABASE_URL=postgresql://user:password@localhost:5432/tododb
-POSTGRES_DB=tododb
-POSTGRES_USER=user
-POSTGRES_PASSWORD=password
+DATABASE_URL=postgresql://user:password@localhost:5432/tododb # URL подключение к БД для бекенда
+POSTGRES_DB=tododb # Имя БД
+POSTGRES_USER=user # Пользователь БД
+POSTGRES_PASSWORD=password # Пароль БД
+REACT_APP_API_BASE_URL=http://localhost:8000 # Путь к API для фронта
 ```
 
 
@@ -45,7 +46,7 @@ docker compose up -d postgres
 Создаем вируальное окружение
 ```python -m venv venv```
 
-Активируем
+Активируем окружение
 ```source venv/bin/activate```
 
 Устанавливаем зависимости
