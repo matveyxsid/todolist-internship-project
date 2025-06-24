@@ -8,7 +8,9 @@ import {
   DeleteTodoTodosTodoIdDeleteRequest,
 } from './api/client';
 
-const config = new Configuration({ basePath: 'http://localhost:8000' });
+const config = new Configuration({
+  basePath: process.env.REACT_APP_API_BASE_URL,
+});
 const api = new DefaultApi(config);
 
 function App() {
