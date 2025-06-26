@@ -9,7 +9,7 @@
 
 ### Требования
 - Docker + Docker Compose
-- Python 3.10+
+- Python 3.9+
 - Node.js 18+
 
 ### Установка 
@@ -21,7 +21,7 @@ cd todolist
 ```
 
 
-### Конфигурация
+### Конфигурация Docker compose
 Создаем .env и указываем переменные окружения
 
 ```
@@ -64,9 +64,9 @@ docker compose up -d postgres
 Устанавливает зависимости
 ```npm install```
 
-В директории frontend/ создаем .env с переменной REACT_APP_API_BASE_URL 
+В директории frontend/ создаем .env с переменной REACT_APP_API_BASE_URL - задаем адрес API относительно фронта
 ```
-REACT_APP_API_BASE_URL=http://localhost:8000 #адрес бека относительно фронта
+REACT_APP_API_BASE_URL=http://localhost:8000 
 ```
 
 Запускаем фронтенд
