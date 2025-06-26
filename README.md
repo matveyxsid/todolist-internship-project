@@ -29,7 +29,6 @@ DATABASE_URL=postgresql://user:password@localhost:5432/tododb # URL подклю
 POSTGRES_DB=tododb # Имя БД
 POSTGRES_USER=user # Пользователь БД
 POSTGRES_PASSWORD=password # Пароль БД
-REACT_APP_API_BASE_URL=http://localhost:8000 # Путь к API для фронта
 ```
 
 
@@ -64,6 +63,9 @@ docker compose up -d postgres
 
 Устанавливает зависимости
 ```npm install```
+
+В директории frontend/ создаем .env с переменной REACT_APP_API_BASE_URL 
+```REACT_APP_API_BASE_URL=http://localhost:8000 #адрес бека относительно фронта```
 
 Запускаем фронтенд
 ```npm start```
