@@ -64,7 +64,7 @@ docker compose up -d postgres
 Устанавливает зависимости
 ```npm install```
 
-В директории frontend/ создаем .env с переменной REACT_APP_API_BASE_URL - задаем адрес API относительно фронта
+В директории frontend/ создаем .env с переменной REACT_APP_API_BASE_URL - задаем адрес API
 ```
 REACT_APP_API_BASE_URL=http://localhost:8000 
 ```
