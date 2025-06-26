@@ -65,7 +65,9 @@ docker compose up -d postgres
 ```npm install```
 
 В директории frontend/ создаем .env с переменной REACT_APP_API_BASE_URL 
-```REACT_APP_API_BASE_URL=http://localhost:8000 #адрес бека относительно фронта```
+```
+REACT_APP_API_BASE_URL=http://localhost:8000 #адрес бека относительно фронта
+```
 
 Запускаем фронтенд
 ```npm start```
