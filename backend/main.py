@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # create tables if they don't exist
 models.Base.metadata.create_all(bind=engine)
 
-# создает fast-api приложение
+# create fast-api app
 app = FastAPI(
     title="To-Do List API",
     version="0.0.2"
