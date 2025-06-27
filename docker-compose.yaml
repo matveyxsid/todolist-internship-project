@@ -16,6 +16,7 @@ services:
   backend:
     build:
       context: ./backend
+    image: todo-backend:latest
     container_name: backend-py
     environment:
       DATABASE_URL: ${DATABASE_URL}
