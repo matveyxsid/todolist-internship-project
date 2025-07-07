@@ -16,10 +16,13 @@ services:
   backend:
     build:
       context: ./backend
+      args:
+        BACKEND_VERSION: ${BACKEND_VERSION}
     image: todo-backend:latest
     container_name: todo-backend
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/tododb
+      BACKEND_VERSION: ${BACKEND_VERSION}
     ports:
       - 8000:8000
     depends_on:
@@ -29,6 +32,9 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        REACT_APP_VERSION: ${REACT_APP_VERSION}
+        REACT_APP_API_BASE_URL: ${REACT_APP_API_BASE_URL}
     image: todo-frontend:latest
     container_name: todo-frontend
     volumes:
@@ -38,6 +44,3 @@ services:
     depends_on:
       - postgres
       - backend
-    
-
-  
