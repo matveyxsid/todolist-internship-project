@@ -13,6 +13,8 @@ const config = new Configuration({
 });
 const api = new DefaultApi(config);
 
+const frontendVersion = process.env.REACT_APP_VERSION;
+
 function App() {
   const [todos, setTodos] = useState<TodoOut[]>([]);
   const [newTitle, setNewTitle] = useState('');
@@ -77,7 +79,7 @@ function App() {
       padding: '2rem',
     }}>
       <h1 style={{ textAlign: 'center', color: '#00ffcc' }}>To-Do List</h1>
-      
+
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
         <input
           type="text"
@@ -124,7 +126,7 @@ function App() {
           }}>
             <div
               onClick={() => toggleCompleted(todo)}
-              style={{ 
+              style={{
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -159,8 +161,13 @@ function App() {
           </li>
         ))}
       </ul>
+      <p style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.9rem', color: '#888' }}>
+        Frontend version: v{frontendVersion}
+      </p>
     </div>
   );
 }
+
+
 
 export default App;
