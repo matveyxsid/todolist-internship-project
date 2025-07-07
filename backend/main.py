@@ -13,8 +13,7 @@ models.Base.metadata.create_all(bind=engine)
 
 # create fast-api app
 app = FastAPI(
-    title="To-Do List API",
-    version="0.0.2"
+    title="To-Do List API"
 )
 
 # CORS for frontend
@@ -74,7 +73,12 @@ def delete_todo(todo_id: int, db: Session = Depends(get_db)):
     db.commit()
 
 # app version
-@app.get("/api/version")
+@app.get("/version")
 def get_backend_version():
     version = os.getenv("BACKEND_VERSION", "unknown")
     return {"version": version}
+
+# healthcheck
+@app.get("/health")
+def health():
+    return {"status": "ok"}
