@@ -4,6 +4,7 @@ import models
 import schemas
 from database import SessionLocal, engine
 from fastapi.middleware.cors import CORSMiddleware
+import os
 
 
 
@@ -71,3 +72,9 @@ def delete_todo(todo_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Todo not found")
     db.delete(todo)
     db.commit()
+
+# app version
+@app.get("/api/version")
+def get_backend_version():
+    version = os.getenv("BACKEND_VERSION", "unknown")
+    return {"version": version}
