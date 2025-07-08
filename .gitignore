@@ -3,3 +3,4 @@ backend/venv/
 postgres_data/
 .vscode
 .DS_Store
+.notes.txt
