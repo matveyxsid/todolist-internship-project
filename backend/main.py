@@ -8,8 +8,8 @@ import os
 
 
 
-# create tables if they don't exist
-models.Base.metadata.create_all(bind=engine)
+# create tables if they don't exist. already use alembic
+#models.Base.metadata.create_all(bind=engine)
 
 # create fast-api app
 app = FastAPI(
