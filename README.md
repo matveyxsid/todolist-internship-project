@@ -1,9 +1,18 @@
 # TODO List (Altenar internship project)
 
 ## Полный запуск через Docker Compose
+Создаем в корне .env и указываем параметры
+```
+DATABASE_URL=postgresql://user:password@localhost:5432/tododb # URL подключение к БД для бекенда
+POSTGRES_DB=tododb # Имя БД
+POSTGRES_USER=user # Пользователь БД
+POSTGRES_PASSWORD=password # Пароль БД
+REACT_APP_API_BASE_URL=http://localhost:8000 # url подключения к бекенду
+```
 
-**В процессе, пока в композе только бекенд+бд**
-
+```
+docker compose up -d
+```
 
 ## Локальный запуск приложения с использованием Docker для базы данных
 
@@ -29,6 +38,7 @@ DATABASE_URL=postgresql://user:password@localhost:5432/tododb # URL подклю
 POSTGRES_DB=tododb # Имя БД
 POSTGRES_USER=user # Пользователь БД
 POSTGRES_PASSWORD=password # Пароль БД
+REACT_APP_API_BASE_URL=http://localhost:8000 # url подключения к бекенду
 ```
 
 
@@ -52,7 +62,7 @@ docker compose up -d postgres
 ```pip install -r requirements.txt```
 
 Запускаем FastAPI
-```uvicorn app.main:app --reload```
+```uvicorn main:app --reload```
 
 - API: [http://localhost:8000](http://localhost:8000)  
 - Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
