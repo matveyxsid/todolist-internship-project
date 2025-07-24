@@ -5,6 +5,7 @@ import schemas
 from database import SessionLocal, engine
 from fastapi.middleware.cors import CORSMiddleware
 import os
+import socket
 
 
 
@@ -72,11 +73,19 @@ def delete_todo(todo_id: int, db: Session = Depends(get_db)):
     db.delete(todo)
     db.commit()
 
-# app version
+# app version and host IP
 @app.get("/version")
-def get_backend_version():
-    version = os.getenv("BACKEND_VERSION", "unknown")
-    return {"version": version}
+def get_version():
+    try:
+        hostname = socket.gethostname()
+        ip_address = socket.gethostbyname(hostname)
+    except Exception:
+        ip_address = "unknown"
+
+    return {
+        "version": os.getenv("BACKEND_VERSION", "unknown"),
+        "host_ip": ip_address
+    }
 
 # healthcheck
 @app.get("/health")
