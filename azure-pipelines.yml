@@ -50,7 +50,7 @@ stages:
               echo "Building BACKEND image..."
               docker build \
                 --build-arg BACKEND_VERSION=$(BACKEND_VERSION) \
-                -t $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):v$(BACKEND_VERSION) \
+                -t $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):$(BACKEND_VERSION) \
                 -t $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):latest \
                 backend
             displayName: Docker build (backend)
@@ -59,7 +59,7 @@ stages:
           - bash: |
               set -euo pipefail
               echo "Pushing BACKEND image (v$(BACKEND_VERSION), latest)"
-              docker push $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):v$(BACKEND_VERSION)
+              docker push $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):$(BACKEND_VERSION)
               docker push $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):latest
             displayName: Docker push (backend)
 
@@ -98,7 +98,7 @@ stages:
               docker build \
                 --build-arg REACT_APP_VERSION=$(REACT_APP_VERSION) \
                 --build-arg REACT_APP_API_BASE_URL=$(REACT_APP_API_BASE_URL) \
-                -t $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):v$(REACT_APP_VERSION) \
+                -t $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):$(REACT_APP_VERSION) \
                 -t $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):latest \
                 frontend
             displayName: Docker build (frontend)
@@ -106,6 +106,6 @@ stages:
           - bash: |
               set -euo pipefail
               echo "Pushing FRONTEND image (v..., latest)"
-              docker push $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):v$(REACT_APP_VERSION)
+              docker push $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):$(REACT_APP_VERSION)
               docker push $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):latest
             displayName: Docker push (frontend)
