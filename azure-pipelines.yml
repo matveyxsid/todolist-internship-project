@@ -35,14 +35,10 @@ stages:
             displayName: Validate backend version
 
           # docker hub login
-          - bash: |
-              set -euo pipefail
-              echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-              docker info | grep -i 'username' || true
-            displayName: Docker login (vars)
-            env:
-              DOCKERHUB_USERNAME: $(DOCKERHUB_USERNAME)
-              DOCKERHUB_TOKEN: $(DOCKERHUB_TOKEN)
+          - task: Docker@2
+            inputs:
+              containerRegistry: 'DockerHub'
+              command: 'login'
 
           # build docker image (backend)
           - bash: |
@@ -82,14 +78,10 @@ stages:
               REACT_APP_VERSION: $(REACT_APP_VERSION)
               REACT_APP_API_BASE_URL: $(REACT_APP_API_BASE_URL)
 
-          - bash: |
-              set -euo pipefail
-              echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-              docker info | grep -i 'username' || true
-            displayName: Docker login (vars)
-            env:
-              DOCKERHUB_USERNAME: $(DOCKERHUB_USERNAME)
-              DOCKERHUB_TOKEN: $(DOCKERHUB_TOKEN)
+          - task: Docker@2
+            inputs:
+              containerRegistry: 'DockerHub'
+              command: 'login'
 
           # build frontend with args
           - bash: |
