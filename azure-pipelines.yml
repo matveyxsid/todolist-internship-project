@@ -30,8 +30,8 @@ stages:
           # check varibles
           - bash: |
               set -euo pipefail
-              : "${BACKEND_VERSION:?BACKEND_VERSION is required}"
-              echo "BACKEND_VERSION=$(BACKEND_VERSION)"
+              : "${APP_VERSION:?APP_VERSION is required}"
+              echo "APP_VERSION=$(APP_VERSION)"
             displayName: Validate backend version
 
           # docker hub login
