@@ -13,7 +13,7 @@ variables:
   - group: 'dockerhub-creds'
 
 pool:
-  vmImage: ubuntu-latest
+  name: 'SelfHosted'
 
 stages:
   - stage: build_and_push
