@@ -74,9 +74,6 @@ stages:
               echo "REACT_APP_VERSION=$(REACT_APP_VERSION)"
               echo "REACT_APP_API_BASE_URL=$(REACT_APP_API_BASE_URL)"
             displayName: Validate frontend build args
-            env:
-              REACT_APP_VERSION: $(REACT_APP_VERSION)
-              REACT_APP_API_BASE_URL: $(REACT_APP_API_BASE_URL)
 
           - task: Docker@2
             inputs:
