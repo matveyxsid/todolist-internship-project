@@ -29,6 +29,13 @@ stages:
             fetchDepth: 0
 
             # Gitversion
+
+          - task: UseDotNet@2
+            displayName: Install .NET SDK
+            inputs:
+              packageType: 'sdk'
+              version: '8.x'
+
           - task: gitversion-setup@4
             displayName: GitVersion setup
             inputs:
