@@ -1,21 +1,8 @@
-# gitversion.yml
-workflow: ''                 # без GitFlow шаблона, чтобы не подмешивались дефолты
-mode: Mainline               # одна основная линия разработки
-next-version: 1.0.0          # стартовая версия, если ещё нет тегов
-
+workflow: TrunkBased/preview1
 branches:
   main:
-    regex: ^main$
-    label: ''                # вместо tag: '' — релизы без суффикса
-    increment: Patch         # по умолчанию растим patch
-    is-main-branch: true
-
+    regex: ^master$
+    label: ''
   feature:
-    # поддержим feature/ feat/ fix/ bugfix/ и возьмём имя ветки в группу BranchName
     regex: (?i)^(feature|feat|fix|bugfix)[\/-](?<BranchName>.+)
-    label: alpha.{BranchName} # вместо tag: alpha — пререлиз вида 1.2.3-alpha.payments.4
-    increment: Inherit        # как правило наследуем инкремент
-    track-merge-message: true # полезно для Mainline
-
-commit-message-incrementing: Enabled
-# +semver: major | minor | patch | none работают из коробки
+    label: alpha.{BranchName}
