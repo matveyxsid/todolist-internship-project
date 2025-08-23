@@ -1,11 +1,10 @@
 # gitversion.yml
-workflow: TrunkBased/preview1     # <-- новый workflow в v6
-next-version: 1.0.0
+workflow: TrunkBased/preview1
 commit-message-incrementing: Enabled
 
 branches:
   main:
-    regex: ^(main|master)$
+    regex: ^master$
     label: ''
     increment: Patch
     is-main-branch: true
