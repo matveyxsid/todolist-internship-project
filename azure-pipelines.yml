@@ -23,37 +23,41 @@ stages:
 
       # GitVersion (Docker)
       - job: init
-        displayName: GitVersion (Docker)
+        displayName: Init (GitVersion)
         steps:
           - checkout: self
             fetchDepth: 0
 
           - bash: |
-              set -euo pipefail
+              set -Eeuo pipefail
+              echo "Using GitTools GitVersion 6.4.0 (Docker)"
               docker pull gittools/gitversion:6.4.0
 
               REPO_DIR="$(Build.SourcesDirectory)"
-              echo "Calculate SemVer..."
-              SEMVER="$(docker run --rm -v "$REPO_DIR":/repo gittools/gitversion:6.4.0 \
-                        /repo /config /repo/gitversion.yml /showvariable SemVer)"
-              echo "SemVer=$SEMVER"
+              echo "Repo dir: $REPO_DIR"
+              test -f "$REPO_DIR/gitversion.yml" && echo "Found gitversion.yml" || echo "No gitversion.yml"
 
-               OUT="$(docker run --rm -v "$REPO_DIR":/repo gittools/gitversion:6.4.0 \
-               /repo -config /repo/gitversion.yml -output json -showvariable SemVer 2>&1)"
-               RC=$?
-               echo "$OUT"
-              if [ $RC -ne 0 ]; then
-                 echo "GitVersion failed (rc=$RC). Полный JSON для диагностики:"
-                 docker run --rm -v "$REPO_DIR":/repo gittools/gitversion:6.4.0 /repo -output json || true
-                 exit $RC
+              echo "GitVersion /showconfig (effective config):"
+              docker run --rm -v "$REPO_DIR":/repo gittools/gitversion:6.4.0 \
+                /repo /showconfig || true
+
+              echo "Calculate SemVer..."
+              OUT="$(docker run --rm -v "$REPO_DIR":/repo gittools/gitversion:6.4.0 \
+                      /repo -config /repo/gitversion.yml -output json -showvariable SemVer 2>&1)"
+              RC=$?
+              echo "$OUT"
+              if [ $RC -ne 0 ] || [ -z "$OUT" ]; then
+                echo "GitVersion failed (rc=$RC). Dumping diagnostics:"
+                docker run --rm -v "$REPO_DIR":/repo gittools/gitversion:6.4.0 /repo -output json || true
+                exit ${RC:-1}
               fi
 
-               SEMVER="$OUT"
-
-              # output
+              SEMVER="$OUT"
+              echo "SemVer=$SEMVER"
+              # экспорт как output-переменная шага 'setver'
               echo "##vso[task.setvariable variable=APP_VERSION;isOutput=true]$SEMVER"
             name: setver
-            displayName: GitVersion (Docker)
+            displayName: GitVersion (Docker) → APP_VERSION
 
 ######### BACKEND #########
       - job: backend
