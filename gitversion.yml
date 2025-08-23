@@ -1,4 +1,11 @@
-workflow: TrunkBased/preview1
+workflow: GitHubFlow/v1
+strategies:
+  - TaggedCommit
+  - ConfiguredNextVersion
+  - MergeMessage
+
+next-version: 1.0.0
+
 branches:
   main:
     regex: ^master$
@@ -6,3 +13,5 @@ branches:
   feature:
     regex: (?i)^(feature|feat|fix|bugfix)[\/-](?<BranchName>.+)
     label: alpha.{BranchName}
+
+commit-message-incrementing: Enabled
