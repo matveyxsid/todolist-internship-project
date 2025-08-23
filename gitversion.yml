@@ -1,5 +1,4 @@
 workflow: TrunkBased/preview1
-tag-prefix: 'v'
 branches:
   main:
     regex: ^master$
