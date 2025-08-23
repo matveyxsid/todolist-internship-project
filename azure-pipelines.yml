@@ -67,7 +67,7 @@ stages:
                 -t $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):$(APP_VERSION) \
                 -t $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):latest \
                 backend
-            displayName: Docker build (backend)
+            displayName: Docker build1
 
           # push backend latest + version
           - bash: |
@@ -75,7 +75,7 @@ stages:
               echo "Pushing BACKEND image ($(APP_VERSION))"
               docker push $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):$(APP_VERSION)
               docker push $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):latest
-            displayName: Docker push (backend :version)
+            displayName: Docker push
 
 ######### FRONTEND #########
       - job: frontend
@@ -111,7 +111,7 @@ stages:
                 -t $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):$(APP_VERSION) \
                 -t $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):latest \
                 frontend
-            displayName: Docker build (frontend)
+            displayName: Docker build
             env:
               REACT_APP_API_BASE_URL: $(REACT_APP_API_BASE_URL)
 
@@ -121,4 +121,4 @@ stages:
               echo "Pushing FRONTEND image ($(APP_VERSION))"
               docker push $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):$(APP_VERSION)
               docker push $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):latest
-            displayName: Docker push (frontend)
+            displayName: Docker push
