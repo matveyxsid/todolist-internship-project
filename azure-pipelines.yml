@@ -29,22 +29,27 @@ stages:
             fetchDepth: 0
 
             # Gitversion
+          - bash: |
+              set -euo pipefail
 
-          - task: UseDotNet@2
-            displayName: Install .NET SDK
-            inputs:
-              packageType: 'sdk'
-              version: '8.x'
+              echo "Pull GitVersion image (5.12.0)..."
+              docker pull gittools/gitversion:5.12.0 || true
 
-          - task: gitversion-setup@4
-            displayName: GitVersion setup
-            inputs:
-              versionSpec: '5.12.0'
+              REPO_DIR="$(Build.SourcesDirectory)"
 
-          - task: gitversion-execute@4
-            displayName: GitVersion execute
-            inputs:
-              configFilePath: 'gitversion.yml'
+              echo "Calculate SemVer..."
+              SEMVER="$(docker run --rm -v "$REPO_DIR":/repo gittools/gitversion:5.12.0 /repo /config /repo/gitversion.yml /showvariable SemVer)"
+              echo "SemVer = $SEMVER"
+
+              echo "Calculate PreReleaseTag..."
+              PRERELEASE="$(docker run --rm -v "$REPO_DIR":/repo gittools/gitversion:5.12.0 /repo /config /repo/gitversion.yml /showvariable PreReleaseTag || true)"
+              echo "PreReleaseTag = ${PRERELEASE:-<empty>}"
+
+              # передаём как outputs для следующих job'ов
+              echo "##vso[task.setvariable variable=APP_VERSION;isOutput=true]$SEMVER"
+              echo "##vso[task.setvariable variable=PRERELEASE;isOutput=true]$PRERELEASE"
+            name: setver
+            displayName: Run GitVersion in Docker
               
 
           # docker hub login
