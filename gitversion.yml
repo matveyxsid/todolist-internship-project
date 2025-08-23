@@ -1,7 +1,4 @@
 workflow: GitHubFlow/v1
-# НЕ указывать strategies вовсе (или оставить только ConfiguredNextVersion)
-# strategies:
-#   - ConfiguredNextVersion
 
 next-version: 1.0.0
 commit-message-incrementing: Enabled
