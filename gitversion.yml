@@ -1,17 +1,20 @@
 workflow: GitHubFlow/v1
-strategies:
-  - TaggedCommit
-  - ConfiguredNextVersion
-  - MergeMessage
+# НЕ указывать strategies вовсе (или оставить только ConfiguredNextVersion)
+# strategies:
+#   - ConfiguredNextVersion
 
 next-version: 1.0.0
+commit-message-incrementing: Enabled
 
 branches:
   main:
     regex: ^master$
     label: ''
-  feature:
-    regex: (?i)^(feature|feat|fix|bugfix)[\/-](?<BranchName>.+)
-    label: alpha.{BranchName}
+    increment: Patch
+    is-main-branch: true
 
-commit-message-incrementing: Enabled
+  feature:
+    regex: ^(feature|feat|fix|bugfix)/(?<BranchName>.+)
+    label: alpha
+    increment: Inherit
+    source-branches: [main]
