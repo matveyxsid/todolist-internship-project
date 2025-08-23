@@ -1,0 +1,12 @@
+mode: Mainline                # одна основная ветка, без develop
+next-version: 1.0.0           # стартовая версия, если ещё нет тегов
+branches:
+  main:
+    regex: ^main$
+    tag: ''                   # без суффиксов для релизов
+    increment: patch          # по умолчанию растим patch
+  feature:
+    regex: ^(feature|feat|fix|bugfix)/
+    tag: alpha                # pre-release: 1.2.3-alpha.1
+commit-message-incrementing: Enabled
+# GitVersion уже умеет понимать "+semver: major|minor|patch" в сообщениях коммитов
