@@ -1,12 +1,21 @@
-mode: Mainline                # одна основная ветка, без develop
-next-version: 1.0.0           # стартовая версия, если ещё нет тегов
+# gitversion.yml
+workflow: ''                 # без GitFlow шаблона, чтобы не подмешивались дефолты
+mode: Mainline               # одна основная линия разработки
+next-version: 1.0.0          # стартовая версия, если ещё нет тегов
+
 branches:
   main:
     regex: ^main$
-    tag: ''                   # без суффиксов для релизов
-    increment: patch          # по умолчанию растим patch
+    label: ''                # вместо tag: '' — релизы без суффикса
+    increment: Patch         # по умолчанию растим patch
+    is-main-branch: true
+
   feature:
-    regex: ^(feature|feat|fix|bugfix)/
-    tag: alpha                # pre-release: 1.2.3-alpha.1
+    # поддержим feature/ feat/ fix/ bugfix/ и возьмём имя ветки в группу BranchName
+    regex: (?i)^(feature|feat|fix|bugfix)[\/-](?<BranchName>.+)
+    label: alpha.{BranchName} # вместо tag: alpha — пререлиз вида 1.2.3-alpha.payments.4
+    increment: Inherit        # как правило наследуем инкремент
+    track-merge-message: true # полезно для Mainline
+
 commit-message-incrementing: Enabled
-# GitVersion уже умеет понимать "+semver: major|minor|patch" в сообщениях коммитов
+# +semver: major | minor | patch | none работают из коробки
