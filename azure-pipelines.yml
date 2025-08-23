@@ -7,10 +7,11 @@ trigger:
       - backend/**
       - frontend/**
       - azure-pipelines.yml
+      - gitversion.yml
 
 variables:
   - group: 'build args'
-  - group: 'dockerhub-creds'
+  - group: 'dockerhub'
 
 pool:
   name: 'SelfHosted'
@@ -20,19 +21,25 @@ stages:
     displayName: Build & Push
     jobs:
 
-      # backend
+######### BACKEND #########
       - job: backend
         displayName: Backend image
         steps:
           - checkout: self
             fetchDepth: 0
 
-          # check varibles
-          - bash: |
-              set -euo pipefail
-              : "${BACKEND_VERSION:?BACKEND_VERSION is required}"
-              echo "BACKEND_VERSION=$(BACKEND_VERSION)"
-            displayName: Validate backend version
+            # Gitversion
+          - task: gitversion/setup@0
+            displayName: Setup GitVersion
+            inputs:
+              versionSpec: '5.x'
+
+          - task: gitversion/execute@0
+            displayName: Calculate version
+            name: gitversion
+            inputs:
+              useConfigFile: true
+              configFilePath: gitversion.yml
 
           # docker hub login
           - task: Docker@2
@@ -43,10 +50,10 @@ stages:
           # build docker image (backend)
           - bash: |
               set -euo pipefail
-              echo "Building BACKEND image..."
+              echo "Building BACKEND $(GitVersion.SemVer)"
               docker build \
-                --build-arg BACKEND_VERSION=$(BACKEND_VERSION) \
-                -t $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):$(BACKEND_VERSION) \
+                --build-arg BACKEND_VERSION=$(GitVersion.SemVer) \
+                -t $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):$(GitVersion.SemVer) \
                 -t $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):latest \
                 backend
             displayName: Docker build (backend)
@@ -54,24 +61,34 @@ stages:
           # push to hub
           - bash: |
               set -euo pipefail
-              echo "Pushing BACKEND image (v$(BACKEND_VERSION), latest)"
-              docker push $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):$(BACKEND_VERSION)
+              echo "Pushing BACKEND image ($(GitVersion.SemVer), latest)"
+              docker push $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):$(GitVersion.SemVer)
               docker push $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):latest
             displayName: Docker push (backend)
 
-      # frontend
+######### FRONTEND #########
       - job: frontend
         displayName: Frontend image
         steps:
           - checkout: self
             fetchDepth: 0
 
-          # check varibles
+          - task: gitversion/setup@0
+            displayName: Setup GitVersion
+            inputs:
+              versionSpec: '5.x'
+
+          - task: gitversion/execute@0
+            displayName: Calculate version
+            name: gitversion
+            inputs:
+              useConfigFile: true
+              configFilePath: gitversion.yml
+
+          # check REACT_APP_API_BASE_URL var
           - bash: |
               set -euo pipefail
-              : "${REACT_APP_VERSION:?REACT_APP_VERSION is required}"
               : "${REACT_APP_API_BASE_URL:?REACT_APP_API_BASE_URL is required}"
-              echo "REACT_APP_VERSION=$(REACT_APP_VERSION)"
               echo "REACT_APP_API_BASE_URL=$(REACT_APP_API_BASE_URL)"
             displayName: Validate frontend build args
 
@@ -85,16 +102,18 @@ stages:
               set -euo pipefail
               echo "Building FRONTEND image..."
               docker build \
-                --build-arg REACT_APP_VERSION=$(REACT_APP_VERSION) \
+                --build-arg REACT_APP_VERSION=$(GitVersion.SemVer) \
                 --build-arg REACT_APP_API_BASE_URL=$(REACT_APP_API_BASE_URL) \
-                -t $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):$(REACT_APP_VERSION) \
+                -t $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):$(GitVersion.SemVer) \
                 -t $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):latest \
                 frontend
             displayName: Docker build (frontend)
 
           - bash: |
               set -euo pipefail
-              echo "Pushing FRONTEND image (v..., latest)"
-              docker push $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):$(REACT_APP_VERSION)
+              echo "Pushing FRONTEND image ($(GitVersion.SemVer), latest)"
+              docker push $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):$(GitVersion.SemVer)
               docker push $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):latest
             displayName: Docker push (frontend)
+
+
