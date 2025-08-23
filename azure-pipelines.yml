@@ -10,8 +10,8 @@ trigger:
       - gitversion.yml
 
 variables:
-  - group: 'build args'     # тут оставь ТОЛЬКО REACT_APP_API_BASE_URL
-  - group: 'dockerhub'      # твой Service Connection 'DockerHub' остаётся
+  - group: 'build args'
+  - group: 'dockerhub'
 
 pool:
   name: 'SelfHosted'
@@ -21,52 +21,27 @@ stages:
     displayName: Build & Push
     jobs:
 
-######### INIT: версия через GitVersion (Docker) #########
+      # GitVersion (Docker)
       - job: init
-        displayName: Resolve version via GitVersion (Docker)
+        displayName: GitVersion (Docker)
         steps:
           - checkout: self
             fetchDepth: 0
 
           - bash: |
               set -euo pipefail
-              set -x
-
-              # 0) Docker доступен?
-              if ! docker info >/dev/null 2>&1; then
-                echo "ERROR: Docker daemon is not reachable from this job."
-                docker --version || true
-                whoami; id; groups
-                command -v systemctl >/dev/null && systemctl status docker -n 50 || true
-                exit 1
-              fi
-
-              # 1) подтянуть теги (GitVersion их использует)
-              git fetch --tags --force
-
-              # 2) образ GitVersion
-              docker pull gittools/gitversion:6.3.0 || true
+              docker pull gittools/gitversion:6.3.0
 
               REPO_DIR="$(Build.SourcesDirectory)"
-              test -d "$REPO_DIR/.git" || { echo "ERROR: .git not found in $REPO_DIR"; ls -la "$REPO_DIR"; exit 1; }
-
-              # 3) считаем SemVer
               echo "Calculate SemVer..."
               SEMVER="$(docker run --rm -v "$REPO_DIR":/repo gittools/gitversion:6.3.0 \
                         /repo /config /repo/gitversion.yml /showvariable SemVer)"
               echo "SemVer=$SEMVER"
 
-              # 4) считаем PreReleaseTag (может быть пустым)
-              echo "Calculate PreReleaseTag..."
-              PRERELEASE="$(docker run --rm -v "$REPO_DIR":/repo gittools/gitversion:6.3.0 \
-                             /repo /config /repo/gitversion.yml /showvariable PreReleaseTag || true)"
-              echo "PreReleaseTag=${PRERELEASE:-<empty>}"
-
-              # 5) отдаём как outputs
+              # output
               echo "##vso[task.setvariable variable=APP_VERSION;isOutput=true]$SEMVER"
-              echo "##vso[task.setvariable variable=PRERELEASE;isOutput=true]$PRERELEASE"
             name: setver
-            displayName: Run GitVersion in Docker (with diagnostics)
+            displayName: GitVersion (Docker)
 
 ######### BACKEND #########
       - job: backend
@@ -74,7 +49,6 @@ stages:
         dependsOn: init
         variables:
           APP_VERSION: $[ dependencies.init.outputs['setver.APP_VERSION'] ]
-          PRERELEASE:  $[ dependencies.init.outputs['setver.PRERELEASE'] ]
         steps:
           - checkout: self
             fetchDepth: 0
@@ -85,33 +59,23 @@ stages:
               containerRegistry: 'DockerHub'
               command: 'login'
 
-          # build docker image (backend)
+          # build docker images (backend)
           - bash: |
               set -euo pipefail
               echo "Building BACKEND $(APP_VERSION)"
               docker build \
-                --build-arg BACKEND_VERSION=$(APP_VERSION) \
-                --label org.opencontainers.image.version=$(APP_VERSION) \
-                --label org.opencontainers.image.revision=$(Build.SourceVersion) \
                 -t $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):$(APP_VERSION) \
                 -t $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):latest \
                 backend
             displayName: Docker build (backend)
 
-          # push :version
+          # push backend latest + version
           - bash: |
               set -euo pipefail
               echo "Pushing BACKEND image ($(APP_VERSION))"
               docker push $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):$(APP_VERSION)
-            displayName: Docker push (backend :version)
-
-          # push :latest — только для релизов
-          - bash: |
-              set -euo pipefail
-              echo "Pushing BACKEND image (:latest)"
               docker push $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO):latest
-            displayName: Docker push (backend :latest)
-            condition: and(succeeded(), eq(variables['PRERELEASE'], ''))
+            displayName: Docker push (backend :version)
 
 ######### FRONTEND #########
       - job: frontend
@@ -119,7 +83,6 @@ stages:
         dependsOn: init
         variables:
           APP_VERSION: $[ dependencies.init.outputs['setver.APP_VERSION'] ]
-          PRERELEASE:  $[ dependencies.init.outputs['setver.PRERELEASE'] ]
         steps:
           - checkout: self
             fetchDepth: 0
@@ -145,8 +108,6 @@ stages:
               docker build \
                 --build-arg REACT_APP_VERSION=$(APP_VERSION) \
                 --build-arg REACT_APP_API_BASE_URL=$(REACT_APP_API_BASE_URL) \
-                --label org.opencontainers.image.version=$(APP_VERSION) \
-                --label org.opencontainers.image.revision=$(Build.SourceVersion) \
                 -t $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):$(APP_VERSION) \
                 -t $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):latest \
                 frontend
@@ -154,17 +115,10 @@ stages:
             env:
               REACT_APP_API_BASE_URL: $(REACT_APP_API_BASE_URL)
 
-          # push :version
+          # push frontend latest + version
           - bash: |
               set -euo pipefail
               echo "Pushing FRONTEND image ($(APP_VERSION))"
               docker push $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):$(APP_VERSION)
-            displayName: Docker push (frontend :version)
-
-          # push :latest — только для релизов
-          - bash: |
-              set -euo pipefail
-              echo "Pushing FRONTEND image (:latest)"
               docker push $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):latest
-            displayName: Docker push (frontend :latest)
-            condition: and(succeeded(), eq(variables['PRERELEASE'], ''))
+            displayName: Docker push (frontend)
