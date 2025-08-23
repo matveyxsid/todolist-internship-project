@@ -30,11 +30,11 @@ stages:
 
           - bash: |
               set -euo pipefail
-              docker pull gittools/gitversion:6.3.0
+              docker pull gittools/gitversion:6.4.0
 
               REPO_DIR="$(Build.SourcesDirectory)"
               echo "Calculate SemVer..."
-              SEMVER="$(docker run --rm -v "$REPO_DIR":/repo gittools/gitversion:6.3.0 \
+              SEMVER="$(docker run --rm -v "$REPO_DIR":/repo gittools/gitversion:6.4.0 \
                         /repo /config /repo/gitversion.yml /showvariable SemVer)"
               echo "SemVer=$SEMVER"
 
