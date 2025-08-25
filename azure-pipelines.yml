@@ -43,10 +43,47 @@ stages:
             name: setver
             displayName: GitVersion (Docker)
 
-######### BACKEND #########
+      ######### BACKEND TEST #########
+      - job: test_backend
+        displayName: Backend tests
+        dependsOn: init
+        pool:
+          name: 'SelfHosted'
+        steps:
+          - checkout: self
+            fetchDepth: 0
+
+          # use python 3.9
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.9'
+              addToPath: true
+
+          - bash: |
+              set -euo pipefail
+              cd backend
+              python -m venv venv
+              source venv/bin/activate
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt
+              # pytest httpx for test
+              pip install pytest httpx
+              pytest -v --junitxml=pytest-report.xml
+            displayName: Run pytest
+
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: 'backend/pytest-report.xml'
+              failTaskOnFailedTests: true
+            displayName: Publish test report
+
+      ######### BACKEND #########
       - job: backend
         displayName: Backend image
-        dependsOn: init
+        dependsOn:
+          - init
+          - test_backend
         variables:
           APP_VERSION: $[ dependencies.init.outputs['setver.APP_VERSION'] ]
         steps:
@@ -80,7 +117,9 @@ stages:
 ######### FRONTEND #########
       - job: frontend
         displayName: Frontend image
-        dependsOn: init
+        dependsOn:
+          - init
+          - test_backend
         variables:
           APP_VERSION: $[ dependencies.init.outputs['setver.APP_VERSION'] ]
         steps:
