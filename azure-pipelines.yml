@@ -43,6 +43,33 @@ stages:
             name: setver
             displayName: GitVersion (Docker)
 
+      - job: test_backend
+        displayName: Backend tests
+        dependsOn: init
+        pool:
+          name: 'SelfHosted'
+        steps:
+          - checkout: self
+            fetchDepth: 0
+
+          - bash: |
+              set -euo pipefail
+              cd backend
+              python3 -m venv venv
+              source venv/bin/activate
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt
+              pip install pytest httpx
+              pytest -v --junitxml=pytest-report.xml
+            displayName: Run pytest
+
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: 'backend/pytest-report.xml'
+              failTaskOnFailedTests: true
+            displayName: Publish test report
+
       ######### BACKEND TEST #########
       - job: test_backend
         displayName: Backend tests

@@ -9,7 +9,7 @@ postgres_data/
 .ansible/
 group_vars/
 node_modules/
-
+.pytest_cache
 *.tfstate
 *.tfstate.*
 crash.log
