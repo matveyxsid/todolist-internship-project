@@ -64,6 +64,8 @@ stages:
               pip install pytest httpx
               pytest -v --junitxml=pytest-report.xml
             displayName: Run pytest
+            env:
+              DATABASE_URL: "sqlite:///:memory:"
 
           - task: PublishTestResults@2
             inputs:
