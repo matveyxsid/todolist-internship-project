@@ -1,0 +1,9 @@
+services:
+  backend:
+    image: matveyxt/todo-backend:${BACKEND_VERSION}
+    container_name: todo-backend
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    restart: always

@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: todo-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: api.todo-app.lan
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: todo-backend-svc
+                port:
+                  number: 8000
+
+    - host: todo-app.lan
+      http:
+        paths:              
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: todo-frontend-svc
+                port:
+                  number: 80

@@ -1,0 +1,10 @@
+variable "win_host"     { type = string }  # ip win vbox
+variable "win_user"     { type = string }  # win ssh user
+variable "ssh_key"      { type = string }  # win ssh key
+variable "win_tf_dir"   { type = string }  # win terrafor dir
+variable "kubespray_dir"{ type = string }  # mac kubespray dir
+variable "ansible_user" { type = string }  # ansible user
+variable "ansible_ssh_private_key_file" { type = string } # ansible key
+variable "ansible_playbook_bin" { type = string } # venv
+variable "helm_chart_path" { type = string } # chart path
+variable "control_plane_count" { type = number }

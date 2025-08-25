@@ -1,0 +1,36 @@
+- name:  сreate backend folder
+  file:
+    path: /opt/todo-backend
+    state: directory
+    mode: '0755'
+
+- name: generate and uplod .env (test)
+  template:
+    src: .env.j2
+    dest: /opt/todo-backend/.env
+    mode: '0644'
+
+- name: upload docker-compose.yml
+  copy:
+    src: files/docker-compose-backend.yml
+    dest: /opt/todo-backend/docker-compose.yml
+    mode: '0644'
+
+- name: pull backend image
+  command: docker pull matveyxt/todo-backend:{{ BACKEND_VERSION }}
+
+- name: restart backend container
+  shell: |
+    docker compose down
+    docker compose up -d
+  args:
+    chdir: /opt/todo-backend
+
+- name: check health and do next
+  uri:
+    url: http://localhost:8000/health
+    status_code: 200
+  register: healthcheck
+  retries: 15
+  delay: 2
+  until: healthcheck.status == 200

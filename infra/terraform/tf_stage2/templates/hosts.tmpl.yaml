@@ -1,0 +1,41 @@
+all:
+  hosts:
+%{ for i, ip in masters ~}
+    cp${i+1}:
+      ansible_host: ${ip}
+      ansible_user: ${ansible_user}
+      ansible_ssh_private_key_file: ${ansible_ssh_private_key_file}
+%{ endfor ~}
+%{ for i, ip in workers ~}
+    w${i+1}:
+      ansible_host: ${ip}
+      ansible_user: ${ansible_user}
+      ansible_ssh_private_key_file: ${ansible_ssh_private_key_file}
+%{ endfor ~}
+
+  children:
+    kube_control_plane:
+      hosts:
+%{ for i, _ in masters ~}
+        cp${i+1}:
+%{ endfor ~}
+
+    kube_node:
+      hosts:
+%{ for i, _ in masters ~}
+        cp${i+1}:
+%{ endfor ~}
+%{ for i, _ in workers ~}
+        w${i+1}:
+%{ endfor ~}
+
+    etcd:
+      hosts:
+%{ for i, _ in masters ~}
+        cp${i+1}:
+%{ endfor ~}
+
+    k8s_cluster:
+      children:
+        kube_control_plane:
+        kube_node:

@@ -1,0 +1,12 @@
+apiVersion: v2
+name: ToDoApp
+description: ToDo App, Altenar Internship project
+type: application
+version: 0.2.1
+appVersion: "1.2"
+
+dependencies:
+  - name: postgresql
+    version: 15.5.16
+    repository: https://raw.githubusercontent.com/bitnami/charts/refs/heads/archive-full-index/bitnami
+    condition: postgresql.enabled

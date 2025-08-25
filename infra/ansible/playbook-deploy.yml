@@ -1,0 +1,7 @@
+- name: deploy backend to group
+  hosts: backends
+  serial: 1
+  become: true
+
+  roles:
+    - backend_deploy
