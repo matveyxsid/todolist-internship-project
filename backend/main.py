@@ -96,16 +96,20 @@ def update_completed_status(
     completed: bool = Body(..., embed=True),
     db: Session = Depends(get_db)
 ):
+
     todo = db.query(models.Todo).get(todo_id)
     if not todo:
         raise HTTPException(status_code=404, detail="Todo not found")
-    
+
+    previous_completed = bool(todo.completed)
+
     todo.completed = completed
     db.commit()
     db.refresh(todo)
-    # count only true
-    if completed and not prev:
+
+    if completed and not previous_completed:
         TODO_COMPLETED.inc()
+
     return todo
 
 # accepts json with a new task
