@@ -1,0 +1,35 @@
+backend:
+  replicaCount: 1
+  image:
+    repository: matveyxt/todo-backend
+    tag: "1.1.0-34"
+  service:
+    port: 8000
+  env:
+    databaseUrlSecret: db-urls
+    databaseUrlKey: DATABASE_URL_KUBESPRAY # DATABASE_URL_CLUSTERDB(k8s psql) or DATABASE_URL_EXTERNALDB(lan db)
+
+frontend:
+  replicaCount: 1
+  image:
+    repository: matveyxt/todo-frontend
+    tag: "1.1.0-34"
+  service:
+    port: 80
+
+ingress:
+  backendHost: api.todo-app.lan
+  frontendHost: todo-app.lan
+
+postgresql:
+  enabled: true
+  auth:
+    username: dbuser
+    password: MyDBpass
+    database: todos
+  primary:
+    persistence:
+      enabled: true
+      storageClass: local-path
+      size: 5Gi
+  fullnameOverride: postgresql
