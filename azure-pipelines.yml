@@ -21,17 +21,17 @@ stages:
     displayName: Build & Push
     jobs:
 
-      # GitVersion (Docker)
+      ######### GitVersion (Docker) #########
       - job: init
         displayName: GitVersion (Docker)
         steps:
           - checkout: self
             fetchDepth: 0
+            fetchTags: true
 
           - bash: |
               set -euo pipefail
               docker pull gittools/gitversion:6.4.0
-
               REPO_DIR="$(Build.SourcesDirectory)"
               echo "Calculate SemVer..."
               SEMVER="$(docker run --rm -v "$REPO_DIR":/repo gittools/gitversion:6.4.0 \
