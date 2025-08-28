@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: todo-backend
+  namespace: monitoring
+  labels:
+    release: kps
+spec:
+  selector:
+    matchLabels:
+      app: todo-backend
+  namespaceSelector:
+    matchNames: ["myapp"]
+  endpoints:
+    - targetPort: 8000
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
+      scheme: http
