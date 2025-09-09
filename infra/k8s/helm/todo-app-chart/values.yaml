@@ -2,18 +2,33 @@ backend:
   replicaCount: 1
   image:
     repository: matveyxt/todo-backend
-    tag: "1.1.0-34"
+    tag: "1.2.1-1"
   service:
     port: 8000
+  k8sSecret:
+    enables: false
   env:
     databaseUrlSecret: db-urls
     databaseUrlKey: DATABASE_URL_KUBESPRAY # DATABASE_URL_CLUSTERDB(k8s psql) or DATABASE_URL_EXTERNALDB(lan db)
+
+# Vault Agent Injector 
+  serviceAccountName: myapp-backend
+  podAnnotations:
+    vault.hashicorp.com/agent-inject: "true"
+    vault.hashicorp.com/role: "myapp-backend"
+    vault.hashicorp.com/service: "http://vault.vault.svc:8200"
+    vault.hashicorp.com/agent-inject-secret-appenv: "secret/data/myapp/backend"
+    vault.hashicorp.com/agent-inject-template-appenv: |
+      {{- with secret "secret/data/myapp/backend" -}}
+      export DATABASE_URL="{{ .Data.data.DATABASE_URL }}"
+      {{- end }}
+
 
 frontend:
   replicaCount: 1
   image:
     repository: matveyxt/todo-frontend
-    tag: "1.1.0-34"
+    tag: "1.2.1-1"
   service:
     port: 80
 
