@@ -8,22 +8,38 @@ spec:
   replicas: {{ .Values.backend.replicaCount }}
   selector:
     matchLabels:
-     app: "{{ .Release.Name }}-backend"
+      app: "{{ .Release.Name }}-backend"
   template:
     metadata:
       labels:
-       app: "{{ .Release.Name }}-backend"
+        app: "{{ .Release.Name }}-backend"
+      {{- with .Values.backend.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
+      serviceAccountName: {{ .Values.backend.serviceAccountName | default "myapp-backend" }}
       containers:
         - name: "{{ .Release.Name }}-backend"
           image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
           ports:
             - containerPort: {{ .Values.backend.service.port }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -euo pipefail
+              # загрузить переменные окружения из Vault Agent
+              . /vault/secrets/appenv
+              # применить миграции и запустить приложение
+              alembic upgrade head
+              exec uvicorn main:app --host 0.0.0.0 --port 8000
           env:
+            {{- if .Values.backend.k8sSecret.enabled }}
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.backend.env.databaseUrlSecret }}
                   key: {{ .Values.backend.env.databaseUrlKey }}
+            {{- end }}
             - name: BACKEND_VERSION
               value: "{{ .Values.backend.image.tag }}"
