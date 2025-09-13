@@ -157,3 +157,63 @@ stages:
               docker push $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):$(APP_VERSION)
               docker push $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO):latest
             displayName: Docker push
+
+
+######### deploy #########
+  - stage: deploy
+    displayName: Deploy to k8s
+    dependsOn: build_and_push
+    variables:
+      APP_VERSION: $[ stageDependencies.build_and_push.init.outputs['setver.APP_VERSION'] ]
+      K8S_NAMESPACE: myapp
+      RELEASE_NAME: myapp
+      CHART_PATH: infra/k8s/helm/todo-app-chart
+    jobs:
+    - job: helm_deploy
+      displayName: Helm upgrade
+      steps:
+      - checkout: self
+
+      - task: HelmInstaller@1
+        displayName: Install Helm 3
+        inputs:
+          helmVersionToInstall: '3.14.4'
+
+      - bash: |
+          set -euo pipefail
+          helm dependency update "$(CHART_PATH)"
+        displayName: Helm deps update
+
+      - bash: |
+          set -euo pipefail
+          cat > values.override.yaml <<'EOF'
+          backend:
+            image:
+              repository: $(DOCKERHUB_NAMESPACE)/$(BACKEND_REPO)
+              tag: "$(APP_VERSION)"
+          frontend:
+            image:
+              repository: $(DOCKERHUB_NAMESPACE)/$(FRONTEND_REPO)
+              tag: "$(APP_VERSION)"
+          EOF
+          echo "--- values.override.yaml ---"
+          cat values.override.yaml
+        displayName: Render override values
+
+      - task: HelmDeploy@0
+        displayName: Helm upgrade --install
+        inputs:
+          connectionType: 'Kubernetes Service Connection'
+          kubernetesServiceConnection: 'azure-cd'
+          namespace: '$(K8S_NAMESPACE)'
+          command: 'upgrade'
+          chartType: 'FilePath'
+          chartPath: '$(CHART_PATH)'
+          releaseName: '$(RELEASE_NAME)'
+          valueFile: 'values.override.yaml'
+          arguments: >-
+            --install
+            --create-namespace
+            --wait
+            --timeout 5m
+            --history-max 10
