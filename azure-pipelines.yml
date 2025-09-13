@@ -166,7 +166,7 @@ stages:
     variables:
       APP_VERSION: $[ stageDependencies.build_and_push.init.outputs['setver.APP_VERSION'] ]
       K8S_NAMESPACE: myapp
-      RELEASE_NAME: myapp
+      RELEASE_NAME: todo
       CHART_PATH: infra/k8s/helm/todo-app-chart
     jobs:
     - job: helm_deploy
